@@ -2,3 +2,10 @@ us.stackdump
 src/Part2.cs
 src/Vessel2.cs
 html/*
+/src/bin
+/src/obj
+/src/Properties
+/src/KSP-API.suo
+/src/src.csproj
+/src/KSP-API.v12.suo
+/src/KSP-API.sln

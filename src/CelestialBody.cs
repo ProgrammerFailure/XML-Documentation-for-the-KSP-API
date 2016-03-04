@@ -1,4 +1,9 @@
-﻿using System;
+﻿#region Assembly Assembly-CSharp.dll, v1.0.0.0
+// H:\KSP1.0.5\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll
+#endregion
+
+using KSPAchievements;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,10 +11,10 @@ using UnityEngine;
 /// <summary>
 /// The Sun, the planets, and the moons are all CelestialBodies.
 /// </summary>
-public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
-{   
-    public float altitudeMultiplier;
-    public float altitudeOffset;
+public class CelestialBody : MonoBehaviour, ITargetable, IDiscoverable
+{
+    public AtmosphereFromGround afg;
+    public double albedo;
     /// <summary>
     /// The magnitude of the angular velocity of the body's rotation, in radians per second.
     /// </summary>
@@ -19,27 +24,32 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// rotation and its magnitude is the rotation rate in radians per second.
     /// </summary>
     public Vector3d angularVelocity;
-    public float atmoshpereTemperatureMultiplier;
+    public double atmDensityASL;
     /// <summary>
     /// Whether this body has an atmosphere
     /// </summary>
     public bool atmosphere;
+    public double atmosphereAdiabaticIndex;
     /// <summary>
     /// Presumably, whether jet engines will work in this body's atmosphere
     /// </summary>
     public bool atmosphereContainsOxygen;
-    /// <summary>
-    /// Seems to be the pressure of the body's atmosphere at sea level, in units of Kerbin atmospheres at sea level.
-    /// Appears to only have an effect when useLegacyAtmosphere is toggled on
-    /// </summary>
-    public float atmosphereMultiplier;
-    /// <summary>
-    /// The atmosphere's scale height, in KILOMETERS (not meters). The atmospheric pressure at a given altitude
-    /// above sea level is proportional to Math.Exp(-altitude / atmosphereScaleHeight).
-    /// </summary>
-    public double atmosphereScaleHeight;
+    public double atmosphereDepth;
+    public double atmosphereGasMassLapseRate;
+    public double atmosphereMolarMass;
+    public FloatCurve atmospherePressureCurve;
+    public bool atmospherePressureCurveIsNormalized;
+    public double atmospherePressureSeaLevel;
+    public FloatCurve atmosphereTemperatureCurve;
+    public bool atmosphereTemperatureCurveIsNormalized;
+    public double atmosphereTemperatureLapseRate;
+    public double atmosphereTemperatureSeaLevel;
+    public FloatCurve atmosphereTemperatureSunMultCurve;
+    public bool atmosphereUsePressureCurve;
+    public bool atmosphereUseTemperatureCurve;
     public Color atmosphericAmbientColor;
-    public CBAttributeMap BiomeMap;
+    public FloatCurve axialTemperatureSunMultCurve;
+    public CBAttributeMapSO BiomeMap;
     public string bodyDescription;
     /// <summary>
     /// The name of the body, as a string.
@@ -47,7 +57,12 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     public string bodyName;
     public Transform bodyTransform;
     public CelestialBodyType bodyType;
+    public double convectionMultiplier;
+    public double coreTemperatureOffset;
+    public double Density;
     public double directRotAngle;
+    public FloatCurve eccentricityTemperatureSunMultCurve;
+    public double emissivity;
     /// <summary>
     /// The gravitational acceleration of the body at sea level, in units of gees (1 gee = 9.81 m/s^2)
     /// </summary>
@@ -69,21 +84,39 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     public double initialRotation;
     public bool inverseRotation;
     public float inverseRotThresholdAltitude;
+    public bool isHomeWorld;
+    public FloatCurve latitudeTemperatureBiasCurve;
+    public FloatCurve latitudeTemperatureSunMultCurve;
     /// <summary>
     /// The mass of the body in kilograms. Computed 
     /// </summary>
     public double Mass;
-    /// <summary>
-    /// The height of the upper edge of the body's atmosphere, in meters above sea level. Except,
-    /// not really. The atmosphere really cuts off at an altitude (in meters) of 
-    /// <code>body.atmosphereScaleHeight * 1000 * Math.Log(1e6)</code>
-    /// </summary>
-    public float maxAtmosphereAltitude;
+    public double navballSwitchRadiusMult;
     /// <summary>
     /// Whether this planet has an ocean at "sea level"
     /// </summary>
     public bool ocean;
     /// <summary>
+    public float oceanAFGAltMult;
+    public float oceanAFGBase;
+    public bool oceanAFGLerp;
+    public float oceanAFGMin;
+    public double oceanDensity;
+    public float oceanFogColorAltMult;
+    public Color oceanFogColorEnd;
+    public Color oceanFogColorStart;
+    public float oceanFogDensityAltScalar;
+    public float oceanFogDensityEnd;
+    public float oceanFogDensityExponent;
+    public float oceanFogDensityPQSMult;
+    public float oceanFogDensityStart;
+    public float oceanSkyColorMult;
+    public float oceanSkyColorOpacityAltMult;
+    public float oceanSkyColorOpacityBase;
+    public float oceanSunAltMult;
+    public float oceanSunBase;
+    public float oceanSunMin;
+    public bool oceanUseFog;
     /// this is what gives the celestial body its orbit and makes it go along the orbit as well
     /// </summary>
     public OrbitDriver orbitDriver;
@@ -95,12 +128,12 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// The pqsController computes the terrain of the planet. Note that for the Sun, pqsController = null.
     /// </summary>
     public PQS pqsController;
-    public AnimationCurve pressureCurve;
-    public float pressureMultiplier;
+    public CelestialBodySubtree progressTree;
     /// <summary>
     /// The radius of the planet in meters. Note that this is only the radius of "sea level"; the actual terrain may be higher.
     /// </summary>
     public double Radius;
+    public double radiusAtmoFactor;
     public bool rotates;
     public QuaternionD rotation;
     public double rotationAngle;
@@ -108,14 +141,16 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// The time, in seconds, for the body to complete one rotation around its axis
     /// </summary>
     public double rotationPeriod;
+    public GameObject scaledBody;
     public CelestialBodyScienceParams scienceValues;
+    public double shockTemperatureMultiplier;
+    public double solarDayLength;
+    public bool solarRotationPeriod;
     /// <summary>
     /// The radius of this body's sphere of influence (measured from the center of the body), in meters.
     /// </summary>
     public double sphereOfInfluence;
-    public double staticPressureASL;
-    public AnimationCurve temperatureCurve;
-    // commented out to fix build error: public PlanetQuadTreeController terrainController;
+    public double SurfaceArea;
     /// <summary>
     /// Presumably, whether this body is tidally locked to the body around with it orbits.
     /// </summary>
@@ -126,10 +161,6 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// </summary>
     public float[] timeWarpAltitudeLimits;
     public bool use_The_InName;
-    /// <summary>
-    /// It appears that this setting toggles between old and new atmosphere system
-    /// </summary>
-    public bool useLegacyAtmosphere;
     public Vector3d zUpAngularVelocity;
 
     public extern CelestialBody();
@@ -152,6 +183,7 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     public extern CelestialBody referenceBody { get; }
     public extern Texture2D ResourceMap { get; }
     public extern PResource Resources { get; }
+    public extern Vector3d RotationAxis { get; }
     public extern string theName { get; }
 
     public extern void CBUpdate();
@@ -165,6 +197,7 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// <returns>Altitude in meters</returns>
     public extern double GetAltitude(Vector3d worldPos);
     public extern Bounds getBounds();
+    public extern double GetDensity(double pressure, double temperature);
     /// <summary>
     /// The velocity of the CelestialBody, {AliceWorld, Sun}. (See Orbit.cs for
     /// the reference frame definitions).
@@ -191,6 +224,7 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     public extern Orbit GetOrbit();
     public extern OrbitDriver GetOrbitDriver();
     public extern Vector3d getPositionAtUT(double UT);
+    public extern double GetPressure(double altitude);
     public extern Vector3d GetRelSurfaceNVector(double lat, double lon);
     public extern Vector3d GetRelSurfacePosition(Vector3d worldPosition);
     /// <summary>
@@ -208,6 +242,8 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// <param name="worldPos">A position in world coordinates</param>
     /// <returns>Velocity of the rotating reference frame</returns>
     public extern Vector3d getRFrmVel(Vector3d worldPos);
+    public extern double GetSolarPowerFactor(double density);
+    public extern double GetSpeedOfSound(double pressure, double density);
     public extern Vector3 GetSrfVelocity();
     /// <summary>
     /// Returns a unit vector perpendicular to the surface of the body at the given latitude and
@@ -218,6 +254,7 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// <returns>A unit normal vector to the surface</returns>
     public extern Vector3d GetSurfaceNVector(double lat, double lon);
     public extern VesselTargetModes GetTargetingMode();
+    public extern double GetTemperature(double altitude);
     public extern Transform GetTransform();
     public extern Vector3d getTruePositionAtUT(double UT);
     public extern Vessel GetVessel();
@@ -234,25 +271,21 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     public extern void HideSurfaceResource();
     [ContextMenu("Reset Time Warp Limits")]
     public extern void resetTimeWarpLimits();
-
     /// <summary>Returns the body's altitude above the reference sphere of its primary</summary>
     /// 
     /// <remarks>Implements IDiscoverable</remarks>
     ///
     public extern double RevealAltitude();
-
     /// <summary>Returns the body's mass, in kg</summary>
     /// 
     /// <remarks>Implements IDiscoverable</remarks>
     ///
     public extern float RevealMass();
-
     /// <summary>Returns the body's tracking station name</summary>
     /// 
     /// <remarks>Implements IDiscoverable</remarks>
     ///
     public extern string RevealName();
-
     /// <summary>Describes the state of the body</summary>
     ///
     /// <returns>A string containing the sphere of influence and trajectory of the object</returns>
@@ -262,13 +295,11 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// <remarks>Implements IDiscoverable</remarks>
     ///
     public extern string RevealSituationString();
-
     /// <summary>Returns the body's speed</summary>
     /// 
     /// <remarks>Implements IDiscoverable</remarks>
     ///
     public extern double RevealSpeed();
-
     /// <summary>Returns the type of the body</summary>
     ///
     /// <returns>One of "Sun", "Planet", or "Moon"</returns>
@@ -276,4 +307,6 @@ public class CelestialBody /*: MonoBehaviour, ITargetable, IDiscoverable*/
     /// <remarks>Implements IDiscoverable</remarks>
     ///
     public extern string RevealType();
+    public extern void SetResourceMap(Texture2D map);
+    public extern void SetupConstants();
 }

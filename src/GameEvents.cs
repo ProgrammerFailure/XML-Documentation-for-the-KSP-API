@@ -1,4 +1,7 @@
-﻿
+﻿#region Assembly Assembly-CSharp.dll, v1.0.0.0
+// H:\KSP1.0.5\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll
+#endregion
+
 using Contracts;
 using System;
 
@@ -99,6 +102,7 @@ public static class GameEvents
     /// Triggered when a vessel is fully loaded
     /// </summary>
     public static EventVoid onFlightReady;
+    public static EventData<FlightUIMode> OnFlightUIModeChanged;
     /// <summary>
     /// Deprecated?
     /// </summary>
@@ -360,6 +364,8 @@ public static class GameEvents
     /// also triggered when switching to or loading a new vessel
     /// </summary>
     public static EventData<MapObject> onPlanetariumTargetChanged;
+    public static EventData<CelestialBody, string> OnPQSCityLoaded;
+    public static EventData<CelestialBody, string> OnPQSCityUnloaded;
     /// <summary>
     /// Triggered when a ProgressNode and all of its subNodes are completed.
     /// 
@@ -398,6 +404,7 @@ public static class GameEvents
     /// When reputation level changes; returns total rep amount
     /// </summary>
     public static EventData<float, TransactionReasons> OnReputationChanged;
+    public static EventData<PartModule, string, double> OnResourceConverterOutput;
     /// <summary>
     /// Triggered when reference frame changes (ie from inertial to rotating);
     /// this is generally accompanied by a shift in the camera position
@@ -449,6 +456,7 @@ public static class GameEvents
     /// </summary>
     public static EventVoid onTimeWarpRateChanged;
     public static EventVoid onTooltipDestroyRequested;
+    public static EventData<ScienceData> OnTriggeredDataTransmission;
     /// <summary>
     /// Deprecated? Use onPartUndock
     /// </summary>

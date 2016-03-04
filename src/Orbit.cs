@@ -1,4 +1,8 @@
-﻿using System;
+﻿#region Assembly Assembly-CSharp.dll, v1.0.0.0
+// H:\KSP1.0.5\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll
+#endregion
+
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -53,6 +57,7 @@ using UnityEngine;
 [Serializable]
 public class Orbit
 {
+    public const double Rad2Deg = 57.2958;
     /// <summary>
     /// Whether this patch actually represents a real orbit patch in the projected flight path. Often
     /// Orbit.nextPatch for the last real will not be null, but will be some sort of bogus Orbit object.
@@ -227,6 +232,11 @@ public class Orbit
     /// </summary>
     public extern double semiMinorAxis { get; }
 
+    public extern static Orbit CreateRandomOrbitAround(CelestialBody body);
+    public extern static Orbit CreateRandomOrbitAround(CelestialBody body, double minAltitude, double maxAltitude);
+    public extern static Orbit CreateRandomOrbitFlyBy(CelestialBody tgtBody, double daysToClosestApproach);
+    public extern static Orbit CreateRandomOrbitFlyBy(Orbit targetOrbit, double timeToPeriapsis, double periapsis, double deltaVatPeriapsis);
+    public extern static Orbit CreateRandomOrbitNearby(Orbit baseOrbit);
     public extern void DrawOrbit();
     public extern static void FindClosestPoints(Orbit p, Orbit s, ref double CD, ref double CCD, ref double FFp, ref double FFs, ref double SFp, ref double SFs, double epsilon, int maxIterations, ref int iterationCount);
     public extern Vector3d GetANVector();
@@ -359,5 +369,6 @@ public class Orbit
         ENCOUNTER = 2,
         ESCAPE = 3,
         MANEUVER = 4,
+        IMPACT = 5,
     }
 }

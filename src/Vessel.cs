@@ -1,4 +1,8 @@
-﻿using System;
+﻿#region Assembly Assembly-CSharp.dll, v1.0.0.0
+// H:\KSP1.0.5\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -7,7 +11,7 @@ using UnityEngine;
 /// A Vessel object represents a single vessel. Parts that break off from a vessel become their own Vessels. Vessels that merge
 /// via docking become one Vessel.
 /// </summary>
-public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverable*/
+public class Vessel : MonoBehaviour, IShipconstruct, ITargetable, IDiscoverable
 {
     /// <summary>
     /// Presumably, this is the current acceleration vector of the vessel, in m/s^2?
@@ -30,22 +34,31 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// Presumably, this is the current density of the atmosphere at the vessel's position?
     /// </summary>
     public double atmDensity;
+    public double atmosphericTemperature;
+    public Vector3d CentrifugalAcc;
     /// <summary>
     /// Presumably, this is the position of the center of mass of the vessel?
     /// </summary>
     public Vector3 CoM;
+    public double convectiveCoefficient;
+    public double convectiveMachFlux;
+    public Vector3d CoriolisAcc;
     /// <summary>
     /// The set of flight inputs currently being fed to the vessel. For example the current
     /// throttle being applied to the vesesl is vessel.ctrlState.mainThrottle.
     /// </summary>
     public FlightCtrlState ctrlState;
-    /// <summary>
-    /// Presumably, the current stage of the vessel as seen e.g. in the staging display
-    /// </summary>
     public int currentStage;
-    public FlightIntegrator flightIntegrator;
+    public bool directSunlight;
+    public double distanceToSun;
+    public double dynamicPressurekPa;
+    public KerbalEVA evaController;
+    public double externalTemperature;
+    public ConfigNode flightPlanNode;
     public double geeForce;
     public double geeForce_immediate;
+    public Vector3d gForce;
+    public bool handlePhysicsStats;
     /// <summary>
     /// Appears to always be -1?
     /// </summary>
@@ -66,15 +79,14 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// This is the pid value in the persistent.sfs at the VESSEL level.
     /// </summary>
     public Guid id;
-    /// <summary>
-    /// Presumably, whether this vessel is an EVAing kerbal.
-    /// </summary>
-    public bool isEVA;
+    public double indicatedAirSpeed;
     /// <summary>
     /// Whether the vessel is currently sitting on the ground.
     /// </summary>
     public bool Landed;
     public string landedAt;
+    public string landedAtLast;
+    public double lastUT;
     /// <summary>
     /// The current latitude of the vessel over the current mainBody, in degrees.
     /// </summary>
@@ -83,7 +95,6 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// The universal time at which the vessel was launched, in seconds?
     /// </summary>
     public double launchTime;
-    public static float loadDistance;
     /// <summary>
     /// Whether the vessel is currently loaded. Vessels are only loaded when they come
     /// within about 2.5km of the active vessel.
@@ -94,15 +105,18 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// The current longitude of the vessel over the current mainBody, in degrees
     /// </summary>
     public double longitude;
+    public double mach;
     /// <summary>
     /// Mission elapsed time, in seconds, maybe?
     /// </summary>
     public double missionTime;
     public Vector3 MOI;
+    public double obt_speed;
     /// <summary>
     /// The current velocity of the vessel, in world coordinates, in the nonrotating inertial reference frame.
     /// </summary>
     public Vector3d obt_velocity;
+    public FlightInputCallback OnAutopilotUpdate;
     /// <summary>
     /// You can add your own function to this callback to register a function that can provide flight control input
     /// to the vessel. Once you've registered this callback, it will be called once per FixedUpdate. Provide flight
@@ -124,7 +138,10 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// You can add a function to this callback, and the function will be called when the vessel is "just about to be destroyed."
     /// </summary>
     public Callback OnJustAboutToBeDestroyed;
+    public FlightInputCallback OnPostAutopilotUpdate;
+    public FlightInputCallback OnPreAutopilotUpdate;
     public OrbitDriver orbitDriver;
+    public OrbitRenderer orbitRenderer;
     public OrbitTargeter orbitTargeter;
     /// <summary>
     /// Whether the vessel is currently packed. Vessels are only packed when the come within about 300m of the active vessel.
@@ -167,7 +184,10 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// Some coarse information about the current state of the vessel.
     /// </summary>
     public Vessel.Situations situation;
+    public double solarFlux;
     public double specificAcceleration;
+    public double speed;
+    public double speedOfSound;
     /// <summary>
     /// Whether the vessel is currently splashed down.
     /// </summary>
@@ -177,21 +197,20 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// </summary>
     public Vector3d srf_velocity;
     public Quaternion srfRelRotation;
+    public double srfSpeed;
     public Vessel.State state;
     /// <summary>
     /// Presumably, the atmospheric pressure at the vessel's current location.
     /// </summary>
-    public double staticPressure;
+    public double staticPressurekPa;
+    public ITargetable targetObject;
     /// <summary>
     /// The height in meters of the nearest terrain (including buildings) directly under the vessel, compared to sea level.
     /// Ground which is underwater will have a negative terrainAltitude.
     /// </summary>
     public double terrainAltitude;
     public Vector3 terrainNormal;
-    public static float unloadDistance;
-    /// <summary>
-    /// Presumably, a unit vector in the up (radially outward from the planet) direction.
-    /// </summary>
+    public double totalMass;
     public Vector3d upAxis;
     /// <summary>
     /// Presumably, the vertical speed of the vessel in m/s.
@@ -201,6 +220,8 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// The name of the vessel as it appears in e.g. the tracking station.
     /// </summary>
     public string vesselName;
+    public VesselRanges vesselRanges;
+    public Transform vesselTransform;
     /// <summary>
     /// The type of the vessel, as shown by the type of icon on the map view.
     /// </summary>
@@ -209,6 +230,8 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     public extern Vessel();
 
     public extern ActionGroupList ActionGroups { get; }
+    public extern VesselAutopilot Autopilot { get; }
+    public extern Vector3 CurrentCoM { get; }
     /// <summary>Describes to what extent this object has been explored</summary>
     public extern DiscoveryInfo DiscoveryInfo { get; }
     public extern bool HoldPhysics { get; }
@@ -218,7 +241,9 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     public extern bool isActiveVessel { get; }
     public extern bool isCommandable { get; }
     public extern bool IsControllable { get; }
+    public extern bool isEVA { get; }
     public extern bool isPersistent { get; set; }
+    public extern bool IsRecoverable { get; }
     /// <summary>
     /// Landed || Splashed; use this to determined whether the vessel is on the ground somewhere, whether on land or water.
     /// </summary>
@@ -235,7 +260,9 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// A list of the parts this vessel is composed of.
     /// </summary>
     public extern List<Part> Parts { get; }
+    public extern bool PatchedConicsAttached { get; }
     public extern Transform ReferenceTransform { get; }
+    public extern VesselValues VesselValues { get; }
 
     /// <summary>
     /// Get a part by its index, in some order.
@@ -250,7 +277,10 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// <returns>The matching part, or null if there is  no part with that flightID.</returns>
     public extern Part this[uint flightID] { get; }
 
+    public extern void AttachPatchedConicsSolver();
+    public extern static string AutoRename(Vessel v, string baseName);
     public extern ProtoVessel BackupVessel();
+    public extern void CalculatePhysicsStats();
     /// <summary>
     /// Add a given velocity offset to the vessels current velocity, instantaneously (may only work for loaded vessels?)
     /// </summary>
@@ -260,14 +290,16 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     public extern bool checkSplashed();
     public extern bool checkVisibility();
     public extern void ClearStaging();
+    public extern bool ContainsCollider(Collider c);
     public extern void DespawnCrew();
     public extern void DestroyVesselComponents();
+    public extern void DetachPatchedConicsSolver();
     public extern void Die();
     public extern void FallBackReferenceTransform();
     public extern void FeedInputFeed();
     public extern VesselType FindDefaultVesselType();
     public extern Vector3 findLocalCenterOfMass();
-	/// <summary>
+    /// <summary>
     /// Broken Function with expensive runtime. Do not use. (If it worked it'd do as the name says but it doesn't as of 0.23.5)
     /// </summary>
     /// <returns></returns>
@@ -276,12 +308,15 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// <summary>Returns the vessel's moment of inertia around its center of mass.</summary>
     /// <warning>Returns nonsense answers; DO NOT USE</warning>
     public extern Vector3 findLocalMOI(Vector3 worldCoM);
+    public extern List<T> FindPartModulesImplementing<T>() where T : class;
     /// <summary>
     /// Computes and returns the position of the center of mass of the vessel, in world coordinates.
     /// </summary>
     /// <returns></returns>
     public extern Vector3 findWorldCenterOfMass();
     public extern List<Part> GetActiveParts();
+    public extern Vessel.ActiveResource GetActiveResource(PartResourceDefinition def);
+    public extern List<Vessel.ActiveResource> GetActiveResources();
     public extern int GetCrewCapacity();
     /// <summary>
     /// The number of kerbals inside the vessel. This is ONLY reliable when the vessel is loaded (vessel.loaded == true). 
@@ -293,13 +328,16 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     public extern Vector3 GetFwdVector();
     public extern float GetHeightFromSurface();
     public extern float GetHeightFromTerrain();
+    public extern static string GetLandedAtString(string landedAt);
     public extern static string GetMETString(Vessel v);
     public extern string GetName();
     public extern Vector3 GetObtVelocity();
     public extern Orbit GetOrbit();
     public extern OrbitDriver GetOrbitDriver();
+    public extern Part GetReferenceTransformPart();
     public extern static string GetSituationString(Vessel v);
     public extern Vector3 GetSrfVelocity();
+    public extern VesselTargetModes GetTargetingMode();
     public extern float GetTotalMass();
     /// <summary>
     /// Gets the transform of the part the vessel is being controlled from (i.e., the part
@@ -319,16 +357,18 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     /// </summary>
     public extern void GoOnRails();
     public extern bool HasControlSources();
-    public extern void Initialize(bool fromShipAssembly = false);
+    public extern bool Initialize(bool fromShipAssembly = false);
     public extern ClearToSaveStatus IsClearToSave();
     public extern static bool IsValidVesselName(string name);
     [ContextMenu("Load")]
     public extern void Load();
     public extern void MakeActive();
     public extern void MakeInactive();
+    public extern void MurderCrew();
     public extern void OnDestroy();
     public extern void OnLoadFlightState(Dictionary<string, KSPParseable> dataPool);
     public extern void OnSaveFlightState(Dictionary<string, KSPParseable> dataPool);
+    public extern double PQSAltitude();
     [ContextMenu("Print All Collisions")]
     public extern void printCollisions();
     [ContextMenu("Print Ground Contacts")]
@@ -338,13 +378,51 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     [ContextMenu("Reset Collision Ignores")]
     public extern void ResetCollisionIgnores();
     public extern void ResumeStaging();
+    public extern void ResumeTarget();
+    /// <summary>Returns the vessel's altitude above the reference sphere of 
+    ///		the CelestialBody it orbits</summary>
+    /// 
+    /// <remarks>Implements IDiscoverable</remarks>
+    ///
+    public extern double RevealAltitude();
+    /// <summary>Returns the vessel's mass, in tons</summary>
+    /// 
+    /// <remarks>Implements IDiscoverable</remarks>
+    ///
+    public extern float RevealMass();
+    /// <summary>Returns the vessel's tracking station name</summary>
+    /// 
+    /// <remarks>Implements IDiscoverable</remarks>
+    ///
+    public extern string RevealName();
+    /// <summary>Describes the state of the vessel</summary>
+    ///
+    /// <returns>A string containing the sphere of influence and trajectory of the object</returns>
+    /// 
+    /// <example>"Orbiting the Sun"</example>
+    /// 
+    /// <remarks>Implements IDiscoverable</remarks>
+    ///
+    public extern string RevealSituationString();
+    /// <summary>Returns the vessel's speed</summary>
+    /// 
+    /// <remarks>Implements IDiscoverable</remarks>
+    ///
+    public extern double RevealSpeed();
+    /// <summary>Returns the type of the vessel</summary>
+    ///
+    /// <returns>A string representation of vesselType</returns>
+    /// 
+    /// <remarks>Implements IDiscoverable</remarks>
+    ///
+    public extern string RevealType();
     public extern void SetActiveInternalPart();
     public extern void SetActiveInternalPart(List<Part> visibleParts);
     public extern void SetActiveInternalPart(Part visiblePart);
+    public extern void SetLandedAt(string landedAt);
     public extern void SetPosition(Vector3 position);
     public extern void SetPosition(Vector3 position, bool usePristineCoords);
     public extern void SetReferenceTransform(Part p);
-    public extern void SetReferenceTransform(Transform t);
     public extern void SetRotation(Quaternion rotation);
     /// <summary>
     /// Sets the velocity of the vessel to a new value, instantaneously. May only work for loaded vessels?
@@ -357,71 +435,28 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
     [ContextMenu("Unload")]
     public extern void Unload();
 
-    /// <summary>Returns the vessel's altitude above the reference sphere of 
-    ///		the CelestialBody it orbits</summary>
-    /// 
-    /// <remarks>Implements IDiscoverable</remarks>
-    ///
-    public extern double RevealAltitude();
-
-    /// <summary>Returns the vessel's mass, in tons</summary>
-    /// 
-    /// <remarks>Implements IDiscoverable</remarks>
-    ///
-    public extern float RevealMass();
-
-    /// <summary>Returns the vessel's tracking station name</summary>
-    /// 
-    /// <remarks>Implements IDiscoverable</remarks>
-    ///
-    public extern string RevealName();
-
-    /// <summary>Describes the state of the vessel</summary>
-    ///
-    /// <returns>A string containing the sphere of influence and trajectory of the object</returns>
-    /// 
-    /// <example>"Orbiting the Sun"</example>
-    /// 
-    /// <remarks>Implements IDiscoverable</remarks>
-    ///
-    public extern string RevealSituationString();
-
-    /// <summary>Returns the vessel's speed</summary>
-    /// 
-    /// <remarks>Implements IDiscoverable</remarks>
-    ///
-    public extern double RevealSpeed();
-
-    /// <summary>Returns the type of the vessel</summary>
-    ///
-    /// <returns>A string representation of vesselType</returns>
-    /// 
-    /// <remarks>Implements IDiscoverable</remarks>
-    ///
-    public extern string RevealType();
-
     /// <summary>
     /// The type of Vessel.situation
     /// </summary>
     public enum Situations
     {
-        LANDED = 0,
-        SPLASHED = 1,
+        LANDED = 1,
+        SPLASHED = 2,
         /// <summary>
         /// Waiting on the launchpad, ready to be launched
         /// </summary>
-        PRELAUNCH = 2,
-        FLYING = 3,
+        PRELAUNCH = 4,
+        FLYING = 8,
         /// <summary>
         /// On a collision course with the ground
         /// </summary>
-        SUB_ORBITAL = 4,
-        ORBITING = 5,
+        SUB_ORBITAL = 16,
+        ORBITING = 32,
         /// <summary>
         /// On a hyperbolic trajectory
         /// </summary>
-        ESCAPING = 6,
-        DOCKED = 7,
+        ESCAPING = 64,
+        DOCKED = 128,
     }
 
     public enum State
@@ -429,5 +464,16 @@ public class Vessel /*: MonoBehaviour, ITargetable, IShipconstruct, IDiscoverabl
         INACTIVE = 0,
         ACTIVE = 1,
         DEAD = 2,
+    }
+
+    [Serializable]
+    public class ActiveResource
+    {
+        public double amount;
+        public PartResourceDefinition info;
+        public double maxAmount;
+        public List<Part> parts;
+
+        public ActiveResource(PartResourceDefinition def);
     }
 }

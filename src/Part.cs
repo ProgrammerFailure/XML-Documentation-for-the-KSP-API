@@ -21,10 +21,12 @@ public class Part : MonoBehaviour
     /// to true if they are to function properly.
     /// </summary>
     public bool ActivatesEvenIfDisconnected;
+    public double aerodynamicArea;
     public Transform airlock;
     public float angularDrag;
+    public double atmDensity;
     protected bool attached;
-    public Joint attachJoint;
+    public PartJoint attachJoint;
     public AttachNodeMethod attachMethod;
     /// <summary>
     /// Whether this part is attached to its parent via a stack AttachNode or a surface AttachNode.
@@ -37,7 +39,14 @@ public class Part : MonoBehaviour
     /// </summary>
     public List<AttachNode> attachNodes;
     public AttachRules attachRules;
+    public Vector3 attPos;
+    public Vector3 attPos0;
     public Quaternion attRotation;
+    public Quaternion attRotation0;
+    public Vector3 bodyLiftLocalPosition;
+    public Vector3 bodyLiftLocalVector;
+    public float bodyLiftMultiplier;
+    public float bodyLiftScalar;
     public float breakingForce;
     public float breakingTorque;
     public float buoyancy;
@@ -50,8 +59,11 @@ public class Part : MonoBehaviour
     public int childStageOffset;
     public Collider collider;
     public CollisionEnhancer collisionEnhancer;
+    public Vector3 CoLOffset;
     public Vector3 CoMOffset;
     protected bool connected;
+    public Vector3 CoPOffset;
+    public uint craftID;
     public float crashTolerance;
     /// <summary>
     /// How many crew members this part can fit.
@@ -66,22 +78,26 @@ public class Part : MonoBehaviour
     /// Unused?
     /// </summary>
     public Part.DragModel dragModel;
-    /// <summary>
-    /// Unused?
-    /// </summary>
-    public string dragModelType;
     public Vector3 dragReferenceVector;
-    public double dynamicPressureAtm;
+    public float dragScalar;
+    public Vector3 dragVector;
+    public Vector3 dragVectorDir;
+    public Vector3 dragVectorDirLocal;
+    public float dragVectorMag;
+    public float dragVectorSqrMag;
+    public double dynamicPressurekPa;
     public Part editorCollision;
     public List<Part> editorLinks;
+    public double emissiveConstant;
     public float explosionPotential;
+    public double exposedArea;
+    public string flagURL;
     /// <summary>
     /// A unique identifider for this part. Note that despite the name, each part on the same vessel will still have a different value in this field.
     /// This value is persistent and not affected by game load or docking/undocking or similar.
     /// This is the 'uid' value at the PART level of the persistent.sfs file.
     /// </summary>
     public uint flightID;
-    public FlightIntegrator flightIntegrator;
     public bool frozen;
     /// <summary>
     /// Whether this part allows fuel crossfeed.
@@ -98,10 +114,11 @@ public class Part : MonoBehaviour
     public List<FXGroup> fxGroups;
     public bool GroundContact;
     public bool hasHeiarchyModel;
-    protected float heatConductivity;
-    protected float heatDissipation;
+    public bool hasLiftModule;
+    public double heatConductivity;
+    public double heatConvectiveConstant;
     public Color highlightColor;
-    public bool highlightRecurse;
+    public HighlightingSystem.Highlighter highlighter;
     public Part.HighlightType highlightType;
     public string initialVesselName;
     public int inStageIndex;
@@ -117,6 +134,8 @@ public class Part : MonoBehaviour
     public bool isMirrored;
     public bool isPersistent;
     public uint lastFuelRequestId;
+    public uint launchID;
+    public double machNumber;
     public int manualStageOffset;
     /// <summary>
     /// The DRY mass of this part, not including the mass of any resources it contains
@@ -129,7 +148,7 @@ public class Part : MonoBehaviour
     /// <summary>
     /// The temperature at which this part will explode.
     /// </summary>
-    public float maxTemp;
+    public double maxTemp;
     /// <summary>
     /// Unused.
     /// </summary>
@@ -180,6 +199,7 @@ public class Part : MonoBehaviour
     /// </summary>
     public AvailablePart partInfo;
     public string partName;
+    public Transform partTransform;
     /// <summary>
     /// If physicalSignificance == Part.PhysicalSignificance.NONE, then this part doesn't actually
     /// have any physics. In particular, it has no mass, regardless of what its "mass" field is set to, and no drag.
@@ -191,12 +211,31 @@ public class Part : MonoBehaviour
     public int PhysicsSignificance;
     public Part potentialParent;
     public List<ProtoCrewMember> protoModuleCrew;
-    // commented out to fix build error: public ProtoPart protoPartRef;
     public ProtoPartSnapshot protoPartSnapshot;
+    public double radiativeArea;
+    public double radiatorHeadroom;
+    public double radiatorMax;
+    public Rigidbody rb;
     public float rescaleFactor;
     protected List<Part> resourceTargets;
+    public double resourceThermalMass;
     public PartStates ResumeState;
     public float scaleFactor;
+    public int separationIndex;
+    public double skinExposedArea;
+    public double skinExposedAreaFrac;
+    public double skinExposedMassMult;
+    public double skinInternalConductionMult;
+    public double skinMassPerArea;
+    public double skinMaxTemp;
+    public double skinSkinConductionMult;
+    public double skinTemperature;
+    public double skinThermalMass;
+    public double skinThermalMassModifier;
+    public double skinThermalMassRecip;
+    public double skinToInternalFlux;
+    public double skinUnexposedExternalTemp;
+    public double skinUnexposedMassMult;
     /// <summary>
     /// IF this part is surface-attached to its parent, srfAttachNode is the attach node describing this connection.
     /// </summary>
@@ -215,20 +254,22 @@ public class Part : MonoBehaviour
     protected PartStates state;
     public double staticPressureAtm;
     public Vector3 surfaceAreas;
+    public SymmetryMethod symMethod;
     public List<Part> symmetryCounterparts;
-    public int symmetryMode;
     /// <summary>
     /// The temperature of this part, in some arbitrary units.
     /// </summary>
-    public float temperature;
+    public double temperature;
     public PQS_PartCollider terrainCollider;
+    public double thermalConductionFlux;
+    public double thermalConvectionFlux;
+    public double thermalInternalFlux;
+    public double thermalInternalFluxPrevious;
+    public double thermalMass;
+    public double thermalMassModifier;
+    public double thermalMassReciprocal;
+    public double thermalRadiationFlux;
     public AttachNode topNode;
-    /// <summary>
-    /// The purpose of uid is unknown. It changes everytime a vessel is swithched to, even within the same flight scene. 
-    /// Swith to a nearby vessel and back with [ and ] and the uid of the parts on a vessel will change.
-    /// This value does not save to persistent.sfs, the uid value at the PART level is the part.flightID value instead.
-    /// </summary>
-    public uint uid;
     public Vector3 vel;
     /// <summary>
     /// The vessel to which this part belongs. Beware that vessel == null in the editor.
@@ -244,11 +285,16 @@ public class Part : MonoBehaviour
     public extern BaseActionList Actions { get; }
     public extern int ClassID { get; }
     public extern string ClassName { get; }
-    public extern string ConstructID { get; }
+    public extern DragCubeList DragCubes { get; }
+    public extern EffectList Effects { get; }
     public extern BaseEventList Events { get; }
     public extern BaseFieldList Fields { get; }
     public extern bool hasStagingIcon { get; }
     public extern bool isAttached { get; set; }
+    /// <summary>
+    /// Obsolete since 0.14 and no longer working
+    /// </summary>
+    [Obsolete("for 0.14 support, seriously it's not working anynmore")]
     public extern bool isConnected { get; set; }
     public extern bool isControllable { get; }
     public extern bool Landed { get; }
@@ -258,6 +304,7 @@ public class Part : MonoBehaviour
     /// Don't use this; use Vessel.orbit instead.
     /// </summary>
     public extern Orbit orbit { get; }
+    public extern PartValues PartValues { get; }
     /// <summary>
     /// A list of the resources contained by this part. You can loop over them with
     /// <code>foreach(PartResource resource in part.Resources) { ... }</code>
@@ -267,12 +314,16 @@ public class Part : MonoBehaviour
     /// The rigidbody of this part. See the Unity documentation on rigidbodies for more information.
     /// </summary>
     public extern Rigidbody Rigidbody { get; }
+    public extern bool ShieldedFromAirstream { get; set; }
     public extern bool Splashed { get; }
     public extern PartStates State { get; }
+    public extern Vector3 WCoM { get; }
 
-    public extern bool activate(int currentStage);
-    public extern void addChild(Part child);
+    public bool activate(int currentStage, Vessel activeVessel);
+    public void AddAttachNode(ConfigNode node);
+    public void addChild(Part child);
     public extern bool AddCrewmember(ProtoCrewMember crew);
+    public extern bool AddCrewmemberAt(ProtoCrewMember crew, int seatIndex);
     public extern InternalModel AddInternalPart(ConfigNode node);
     public extern PartModule AddModule(ConfigNode node);
     /// <summary>
@@ -286,6 +337,9 @@ public class Part : MonoBehaviour
     public extern void AddOnMouseEnter(Part.OnActionDelegate method);
     public extern void AddOnMouseExit(Part.OnActionDelegate method);
     public extern PartResource AddResource(ConfigNode node);
+    public extern Callback<IAirstreamShield> AddShield(IAirstreamShield shd);
+    public extern void AddThermalFlux(double kilowatts);
+    public extern bool AlreadyProcessedRequest(int requestID);
     public extern bool CheckCollision(Collision c);
     public extern bool checkLanded();
     public extern bool checkSplashed();
@@ -299,12 +353,15 @@ public class Part : MonoBehaviour
     public extern void Die();
     public extern void disconnect(bool controlledSeparation = false);
     /// <summary>
-    /// Deprecated.
+    /// Deprecated. Use Part.TransferResource instead.
     /// </summary>
     /// <param name="amount"></param>
     /// <returns></returns>
+    [Obsolete("Use Part.TransferResource instead.")]
     public extern virtual bool DrainFuel(float amount);
-    public extern void drawStats();
+    public extern string drawStats();
+    public extern void Effect(string effectName);
+    public extern void Effect(string effectName, float effectPower);
     /// <summary>
     /// Calling this causes the part to explode. But you guessed that, didn't you?
     /// </summary>
@@ -330,8 +387,13 @@ public class Part : MonoBehaviour
     public extern Part FindChildPart(string childName, bool recursive);
     public extern T[] FindChildParts<T>() where T : Part;
     public extern T[] FindChildParts<T>(bool recursive) where T : Part;
+    /// <summary>
+    /// Obsolete - Use Part.GetConnectedResources instead.
+    /// </summary>
+    [Obsolete("Use Part.GetConnectedResources instead.")]
     public extern virtual bool FindFuel(Part source, List<Part> fuelSources, uint reqId);
     public extern FXGroup findFxGroup(string groupID);
+    public extern Animation FindModelAnimator(string animatorName, string clipName);
     public extern Animation[] FindModelAnimators();
     public extern Animation[] FindModelAnimators(string clipName);
     public extern T FindModelComponent<T>() where T : Component;
@@ -340,7 +402,11 @@ public class Part : MonoBehaviour
     public extern T[] FindModelComponents<T>(string childName) where T : Component;
     public extern Transform FindModelTransform(string childName);
     public extern Transform[] FindModelTransforms(string childName);
+    public extern T FindModuleImplementing<T>() where T : class;
+    public extern List<T> FindModulesImplementing<T>() where T : class;
     public extern void FindNonPhysicslessChildren(List<Part> parts);
+    public extern Part FindNonPhysicslessParent();
+    public extern AttachNode FindPartThroughNodes(Part tgtPart, Part src = null);
     /// <summary>
     /// Activates the part now, regardless of when it was scheduled to be activated in the staging order.
     /// </summary>
@@ -350,20 +416,31 @@ public class Part : MonoBehaviour
     public extern static Part FromGO(GameObject obj);
     public extern static T GetComponentUpwards<T>(GameObject obj) where T : Component;
     public extern static Component GetComponentUpwards(string type, GameObject obj);
-    public extern void GetConnectedResources(int resourceID, List<PartResource> resources);
+    public extern void GetConnectedResources(int resourceID, ResourceFlowMode flowMode, List<PartResource> Resources);
     public extern static uint getFuelReqId();
+    public extern float GetModuleCosts(float defaultCost);
+    public extern float GetModuleMass(float defaultMass);
+    public extern Vector3 GetModuleSize(Vector3 defaultSize);
+    public extern float GetPhysicslessChildMass();
+    public extern Transform GetReferenceTransform();
     /// <summary>
     /// The total mass of the resources held by the part. The total mass of the part is <code>mass + GetResourceMass()</code>
     /// </summary>
     /// <returns>Total resource mass, in tonnes</returns>
     public extern float GetResourceMass();
+    public extern float GetResourceMass(out double thermalMass);
+    public extern float GetResourceMass(out float thermalMass);
     public extern Part getSymmetryCounterPart(int index);
     public extern void HandleCollision(Collision c);
     public extern bool hasIndirectChild(Part tgtPart);
     public extern bool hasIndirectParent(Part tgtPart);
+    public extern void InitializeEffects();
+    public extern void InitializeModules();
     public extern bool isSymmetryCounterPart(Part cPart);
-    public extern void LateUpdate();
-    public extern PartModule LoadModule(ConfigNode node, int moduleIndex);
+    public extern virtual void LateUpdate();
+    public extern void LoadEffects(ConfigNode node);
+    public extern PartModule LoadModule(ConfigNode node, ref int moduleIndex);
+    public extern static int NewRequestID();
     protected extern virtual void onActiveFixedUpdate();
     protected extern virtual void onActiveUpdate();
     public extern void onAttach(Part parent, bool first = true);
@@ -378,6 +455,10 @@ public class Part : MonoBehaviour
     public extern void OnDelete();
     public extern void onDetach(bool first = true);
     protected extern virtual void onDisconnect();
+    /// <summary>
+    /// Obsolete("Functional behaviour should really be happening in PartModules now. In any case, this method's been replaced with OnGetStats, where you just return the string."
+    /// </summary>
+    [Obsolete("Functional behaviour should really be happening in PartModules now. In any case, this method's been replaced with OnGetStats, where you just return the string.")]
     public extern virtual void OnDrawStats();
     protected extern virtual void onEditorUpdate();
     protected extern virtual void onFlightStart();
@@ -386,10 +467,12 @@ public class Part : MonoBehaviour
     public extern virtual void onFlightStateSave(Dictionary<string, KSPParseable> partDataCollection);
     protected extern virtual void onGamePause();
     protected extern virtual void onGameResume();
+    public extern virtual string OnGetStats();
     protected extern virtual void onJointDisable();
     protected extern virtual void onJointReset();
     public extern void OnLiftOff();
     public extern void OnLoad();
+    public extern virtual void OnLoad(ConfigNode node);
     protected extern virtual void onPack();
     protected extern virtual bool onPartActivate();
     protected extern virtual void onPartAttach(Part parent);
@@ -400,48 +483,62 @@ public class Part : MonoBehaviour
     protected extern virtual void onPartDetach();
     protected extern virtual void onPartExplode();
     protected extern virtual void onPartFixedUpdate();
+    public extern void OnPartJointBreak(float breakForce);
     protected extern virtual void onPartLiftOff();
     protected extern virtual void onPartLoad();
     protected extern virtual void onPartSplashdown();
     protected extern virtual void onPartStart();
     protected extern virtual void onPartTouchdown();
     protected extern virtual void onPartUpdate();
+    public extern virtual void OnSave(ConfigNode node);
     public extern void OnSplashDown();
     protected extern virtual void onStartComplete();
     public extern void OnTouchDown();
     protected extern virtual void onUnpack();
     public extern void Pack();
+    public extern static Vector3 PartToVesselSpaceDir(Vector3 dir, Part p, Vessel v, PartSpaceMode space);
+    public extern static Vector3 PartToVesselSpacePos(Vector3 pos, Part p, Vessel v, PartSpaceMode space);
+    public extern static Quaternion PartToVesselSpaceRot(Quaternion rot, Part p, Vessel v, PartSpaceMode space);
+    public extern void PromoteToPhysicalPart();
     public extern void propagateControlUpdate(FlightCtrlState st);
+    public extern void RegisterCrew();
     public extern void removeChild(Part child);
     public extern void RemoveCrewmember(ProtoCrewMember crew);
     public extern void RemoveModule(PartModule module);
+    public extern void RemoveModules();
     public extern void RemoveOnMouseDown(Part.OnActionDelegate method);
     public extern void RemoveOnMouseEnter(Part.OnActionDelegate method);
     public extern void RemoveOnMouseExit(Part.OnActionDelegate method);
+    public extern void RemoveShield(IAirstreamShield shd);
     /// <summary>
-    /// Deprecated.
+    /// Deprecated - Use Part.RequestResource instead.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="amount"></param>
     /// <param name="reqId"></param>
     /// <returns></returns>
+    [Obsolete("Use Part.RequestResource instead.")]
     public extern virtual bool RequestFuel(Part source, float amount, uint reqId);
     /// <summary>
-    /// Deprecated.
+    /// Deprecated - Use Part.RequestResource instead.
     /// </summary>
     /// <param name="amount"></param>
     /// <param name="earliestStage"></param>
     /// <returns></returns>
+    [Obsolete("Use Part.RequestResource instead.")]
     public extern virtual bool RequestRCS(float amount, int earliestStage);
-    public extern double RequestResource(int resourceID, double demand);
-    public extern float RequestResource(int resourceID, float demand);
-    public extern double RequestResource(string resourceName, double demand);
-    public extern float RequestResource(string resourceName, float demand);
+    public extern virtual double RequestResource(int resourceID, double demand);
+    public extern virtual float RequestResource(int resourceID, float demand);
+    public extern virtual double RequestResource(string resourceName, double demand);
+    public extern virtual float RequestResource(string resourceName, float demand);
+    public extern virtual double RequestResource(int resourceID, double demand, ResourceFlowMode flowMode);
+    public extern virtual double RequestResource(string resourceName, double demand, ResourceFlowMode flowMode);
     [ContextMenu("Reset Collision Ignores")]
     public extern void ResetCollisionIgnores();
     [DebuggerHidden]
     public extern IEnumerator ResetJoints();
     public extern void ResumeVelocity();
+    public extern void SaveEffects(ConfigNode node);
     public extern void ScheduleSetCollisionIgnores();
     public extern void SendEvent(string eventName);
     public extern void SendEvent(string eventName, BaseEventData data);
@@ -449,7 +546,7 @@ public class Part : MonoBehaviour
     public extern void SetCollisionIgnores();
     public extern void SetDetectCollisions(bool setState);
     public extern void SetHierarchyRoot(Part root);
-    public extern void SetHighlight(bool active);
+    public extern void SetHighlight(bool active, bool recursive);
     public extern void SetHighlightColor();
     public extern void SetHighlightColor(Color color);
     public extern void SetHighlightDefault();
@@ -458,19 +555,27 @@ public class Part : MonoBehaviour
     public extern void SetMirror(Vector3 mirrorVector);
     public extern void setOpacity(float opacity);
     public extern void setParent(Part p = null);
+    public extern void SetReferenceTransform(Transform t);
     public extern void SetResource(ConfigNode node);
     public extern void SpawnCrew();
     public extern double TransferResource(int resourceID, double amount);
     public extern void Undock(DockedVesselInfo newVesselInfo);
     public extern void unfreeze();
     public extern void Unpack();
+    public extern void UnregisterCrew();
     public extern void UpdateOrgPosAndRot(Part newRoot);
+    public extern static Vector3 VesselToPartSpaceDir(Vector3 dir, Part p, Vessel v, PartSpaceMode space);
+    public extern static Vector3 VesselToPartSpacePos(Vector3 pos, Part p, Vessel v, PartSpaceMode space);
+    public extern static Quaternion VesselToPartSpaceRot(Quaternion rot, Part p, Vessel v, PartSpaceMode space);
 
     public enum DragModel
     {
         DEFAULT = 0,
         CONIC = 1,
         CYLINDRICAL = 2,
+        SPHERICAL = 3,
+        CUBE = 4,
+        NONE = 5,
     }
 
     public enum HighlightType
@@ -496,23 +601,4 @@ public class Part : MonoBehaviour
     }
 
     public delegate void OnActionDelegate(Part p);
-}
-
-
-
-/// <summary>
-/// Describes the two possibilities for how a part can be attached to its parent.
-/// </summary>
-public enum AttachModes
-{
-    /// <summary>
-    /// The part is attached to its parent via a stack node; for example this is
-    /// how vertically stacked fuel tanks are attached
-    /// </summary>
-    STACK = 0,
-    /// <summary>
-    /// This part is attached to the surface of its parent; for example this is how
-    /// radial decouplers are attached.
-    /// </summary>
-    SRF_ATTACH = 1,
 }
